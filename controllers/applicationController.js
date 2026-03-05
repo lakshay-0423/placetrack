@@ -3,7 +3,7 @@ const Student = require("../models/Student");
 
 exports.applyJob = async (req, res, next) => {
   try {
-    const student = await Student.findOne({ user: req.user.id });
+    const student = await Student.findOne({ user: req.user.id, isDeleted: false });
 
     if (!student)
       return res.status(400).json({ message: "Student profile required" });

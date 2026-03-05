@@ -2,7 +2,7 @@ const Company = require("../models/Company");
 
 exports.getCompanies = async (req, res, next) => {
   try {
-    const companies = await Company.find();
+    const companies = await Company.find({ isDeleted: false });
     res.json(companies);
   } catch (error) {
     next(error);
@@ -37,7 +37,7 @@ exports.updateCompany = async (req, res, next) => {
 
 exports.deleteCompany = async (req, res, next) => {
   try {
-    const company = await Company.findByIdAndDelete(req.params.id);
+    const company = await Company.findByIdAndUpdate(req.params.id, { isDeleted: true });
 
     if (!company)
       return res.status(404).json({ message: "Company not found" });
@@ -50,7 +50,7 @@ exports.deleteCompany = async (req, res, next) => {
 
 exports.createCompanyProfile = async (req, res, next) => {
   try {
-    const exists = await Company.findOne({ user: req.user.id });
+    const exists = await Company.findOne({ user: req.user.id, isDeleted: false });
     if (exists)
       return res.status(400).json({ message: "Profile already exists" });
 

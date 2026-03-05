@@ -10,7 +10,11 @@ const jobSchema = new mongoose.Schema({
     ref: "Company",
     required: true
   },
-  salary: Number
+  salary: Number,
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model("Job", jobSchema);

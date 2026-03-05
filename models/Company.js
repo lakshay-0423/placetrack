@@ -12,6 +12,10 @@ const companySchema = new mongoose.Schema({
     required: true
   },
   location: String,
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
   description: String
 }, { timestamps: true });
 

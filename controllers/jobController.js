@@ -2,7 +2,7 @@ const Job = require("../models/Job");
 
 exports.getJobs = async (req, res, next) => {
   try {
-    const jobs = await Job.find().populate("company");
+    const jobs = await Job.find({ isDeleted: false }).populate("company");
     res.json(jobs);
   } catch (error) {
     next(error);
@@ -37,7 +37,7 @@ exports.updateJob = async (req, res, next) => {
 
 exports.deleteJob = async (req, res, next) => {
   try {
-    const job = await Job.findByIdAndDelete(req.params.id);
+    const job = await Job.findByIdAndUpdate(req.params.id, { isDeleted: true });
 
     if (!job)
       return res.status(404).json({ message: "Job not found" });

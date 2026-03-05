@@ -17,6 +17,10 @@ const applicationSchema = new mongoose.Schema(
       enum: ["Applied", "Shortlisted", "Rejected", "Selected"],
       default: "Applied",
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    }
   },
   { timestamps: true }
 );

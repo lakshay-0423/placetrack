@@ -14,7 +14,14 @@ const jobSchema = new mongoose.Schema({
   isDeleted: {
     type: Boolean,
     default: false,
-  }
+  },
+  description: String,
+  minCGPA: {
+    type: Number,
+    default: 0
+  },
+  eligibleBranches: [String],
+  passingYear: Number
 }, { timestamps: true });
 
 module.exports = mongoose.model("Job", jobSchema);

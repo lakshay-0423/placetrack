@@ -23,7 +23,11 @@ const studentSchema = new mongoose.Schema({
     isDeleted: {
         type: Boolean,
         default: false,
-    }
+    },
+    cgpa: Number,
+    passingYear: Number,
+    skills: [String],
+    experience: Number
 }, { timestamps: true });
 
 module.exports = mongoose.model("Student", studentSchema);

@@ -21,7 +21,11 @@ const jobSchema = new mongoose.Schema({
     default: 0
   },
   eligibleBranches: [String],
-  passingYear: Number
+  passingYear: Number,
+  requiredSkills: {
+    type: [String],
+    default: []
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model("Job", jobSchema);

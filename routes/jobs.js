@@ -35,4 +35,11 @@ router.delete(
   jobController.deleteJob
 );
 
+router.get(
+  "/:id/rank",
+  protect,
+  authorize("company", "admin"),
+  jobController.getRankedCandidates
+);
+
 module.exports = router;

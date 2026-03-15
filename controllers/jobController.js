@@ -1,6 +1,7 @@
 const Application = require("../models/Application");
 const Student = require("../models/Student");
 const Job = require("../models/Job");
+const Company = require("../models/Company");
 const { calculateScore } = require("../utils/candidateScoring");
 
 exports.getRankedCandidates = async (req, res, next) => {
@@ -47,8 +48,25 @@ exports.getJobs = async (req, res, next) => {
 
 exports.createJob = async (req, res, next) => {
   try {
-    const job = await Job.create(req.body);
+
+    const company = await Company.findOne({ user: req.user.id });
+
+    if (!company)
+      return res.status(400).json({ message: "Company profile required" });
+
+    if (company.status !== "approved") {
+      return res.status(403).json({
+        message: "Company not approved by admin"
+      });
+    }
+
+    const job = await Job.create({
+      ...req.body,
+      company: company._id
+    });
+
     res.status(201).json(job);
+
   } catch (error) {
     next(error);
   }

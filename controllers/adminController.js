@@ -19,3 +19,54 @@ exports.getDashboardStats = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getPendingCompanies = async (req, res, next) => {
+  try {
+
+    const companies = await Company.find({ status: "pending" })
+      .populate("user", "email role");
+
+    res.json(companies);
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.approveCompany = async (req, res, next) => {
+  try {
+
+    const company = await Company.findByIdAndUpdate(
+      req.params.id,
+      { status: "approved" },
+      { new: true }
+    );
+
+    res.json({
+      message: "Company approved",
+      company
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.rejectCompany = async (req, res, next) => {
+  try {
+
+    const company = await Company.findByIdAndUpdate(
+      req.params.id,
+      { status: "rejected" },
+      { new: true }
+    );
+
+    res.json({
+      message: "Company rejected",
+      company
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};

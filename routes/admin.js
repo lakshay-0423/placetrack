@@ -11,4 +11,25 @@ router.get(
   adminController.getDashboardStats
 );
 
+router.get(
+  "/companies/pending",
+  protect,
+  authorize("Admin"),
+  adminController.getPendingCompanies
+);
+
+router.put(
+  "/companies/:id/approve",
+  protect,
+  authorize("Admin"),
+  adminController.approveCompany
+);
+
+router.put(
+  "/companies/:id/reject",
+  protect,
+  authorize("Admin"),
+  adminController.rejectCompany
+);
+
 module.exports = router;

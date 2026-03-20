@@ -4,6 +4,8 @@ const jobController = require("../controllers/jobController");
 const validateObjectId = require("../middleware/validateObjectId");
 const protect = require("../middleware/authMiddleware");
 const authorize = require("../middleware/roleMiddleware");
+const { validate } = require("../middleware/validate");
+const { createJobValidator } = require("../validators/jobValidators");
 
 router.get(
   "/",
@@ -12,10 +14,13 @@ router.get(
   jobController.getJobs
 );
 
+
 router.post(
   "/",
   protect,
-  authorize("admin", "company"),
+  authorize("admin","Company"),
+  createJobValidator,
+  validate,
   jobController.createJob
 );
 

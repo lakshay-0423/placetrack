@@ -37,10 +37,27 @@ exports.getRankedCandidates = async (req, res, next) => {
   }
 };
 
+const Job = require("../models/Job");
+const { getPagination } = require("../utils/pagination");
+
 exports.getJobs = async (req, res, next) => {
   try {
-    const jobs = await Job.find({ isDeleted: false }).populate("company");
-    res.json(jobs);
+    const { page, limit, skip } = getPagination(req);
+
+    const total = await Job.countDocuments({ isDeleted: false });
+
+    const jobs = await Job.find({ isDeleted: false })
+      .skip(skip)
+      .limit(limit)
+      .populate("company");
+
+    res.json({
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+      data: jobs
+    });
+
   } catch (error) {
     next(error);
   }

@@ -3,6 +3,7 @@ const Student = require("../models/Student");
 const Job = require("../models/Job");
 const Company = require("../models/Company");
 const { calculateScore } = require("../utils/candidateScoring");
+const { getPagination } = require("../utils/pagination");
 
 exports.getRankedCandidates = async (req, res, next) => {
   try {
@@ -36,9 +37,6 @@ exports.getRankedCandidates = async (req, res, next) => {
     next(error);
   }
 };
-
-const Job = require("../models/Job");
-const { getPagination } = require("../utils/pagination");
 
 exports.getJobs = async (req, res, next) => {
   try {

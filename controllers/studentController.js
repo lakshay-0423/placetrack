@@ -1,14 +1,28 @@
 const Student = require("../models/Student");
+const { getPagination } = require("../utils/pagination");
 
 exports.getStudents = async (req, res, next) => {
     try {
-        const students = await Student.find({ isDeleted: false });
-        res.json(students);
+        const { page, limit, skip } = getPagination(req);
+
+        const total = await Student.countDocuments({ isDeleted: false });
+
+        const students = await Student.find({ isDeleted: false })
+            .skip(skip)
+            .limit(limit)
+            .populate("user", "-password");
+
+        res.json({
+            total,
+            page,
+            pages: Math.ceil(total / limit),
+            data: students
+        });
+
     } catch (error) {
         next(error);
     }
 };
-
 exports.createStudent = async (req, res, next) => {
     try {
         const student = await Student.create(req.body);

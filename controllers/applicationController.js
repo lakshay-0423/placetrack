@@ -1,6 +1,31 @@
 const Job = require("../models/Job");
 const Student = require("../models/Student");
 const Application = require("../models/Application");
+const { getPagination } = require("../utils/pagination");
+
+exports.getApplications = async (req, res, next) => {
+  try {
+    const { page, limit, skip } = getPagination(req);
+
+    const total = await Application.countDocuments();
+
+    const applications = await Application.find()
+      .skip(skip)
+      .limit(limit)
+      .populate("student")
+      .populate("job");
+
+    res.json({
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+      data: applications
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
 
 exports.applyJob = async (req, res, next) => {
   try {

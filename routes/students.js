@@ -4,6 +4,8 @@ const studentController = require("../controllers/studentController");
 const validateObjectId = require("../middleware/validateObjectId");
 const protect = require("../middleware/authMiddleware");
 const authorize = require("../middleware/roleMiddleware");
+const { paginationValidator } = require("../validators/paginationValidator");
+const { validate } = require("../middleware/validate");
 
 router.post(
   "/profile",
@@ -16,6 +18,8 @@ router.get(
   "/",
   protect,
   authorize("admin"),
+  paginationValidator,
+  validate,
   studentController.getStudents
 );
 

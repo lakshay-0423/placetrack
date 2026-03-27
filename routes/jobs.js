@@ -6,9 +6,11 @@ const protect = require("../middleware/authMiddleware");
 const authorize = require("../middleware/roleMiddleware");
 const { validate } = require("../middleware/validate");
 const { createJobValidator } = require("../validators/jobValidators");
+const { paginationValidator } = require("../validators/paginationValidator");
 
 router.get(
   "/",
+  paginationValidator,
   protect,
   authorize("student", "admin", "company"),
   jobController.getJobs
@@ -18,7 +20,7 @@ router.get(
 router.post(
   "/",
   protect,
-  authorize("admin","Company"),
+  authorize("admin", "Company"),
   createJobValidator,
   validate,
   jobController.createJob

@@ -1,0 +1,46 @@
+<%- include('partials/header') %>
+  <div class="container">
+    <h1 class="page-title animate-in">📈 Company Analytics</h1>
+    <p class="page-subtitle animate-in animate-in-delay-1">Per-company applicant funnel: applied → shortlisted → accepted</p>
+    <div class="glass-card animate-in animate-in-delay-2">
+      <% if (analytics.length === 0) { %>
+        <div class="empty-state">
+          <div class="icon">📊</div>
+          <p>No analytics data yet. Sync from the <a href="/admin/reports" style="color:var(--primary);">Dashboard</a>.</p>
+        </div>
+      <% } else { %>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Company</th><th>Year</th><th>Applicants</th><th>Shortlisted</th><th>Accepted</th><th>Acceptance Rate</th><th>Updated</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% analytics.forEach(function(a) { %>
+                <% var rate = a.totalApplicants > 0 ? ((a.accepted / a.totalApplicants) * 100).toFixed(1) : '0.0'; %>
+                <tr>
+                  <td style="font-weight:500;"><%= a.companyName %></td>
+                  <td><span class="badge badge-info"><%= a.hiringYear %></span></td>
+                  <td><%= a.totalApplicants %></td>
+                  <td><span class="badge badge-warning"><%= a.shortlisted %></span></td>
+                  <td><span class="badge badge-success"><%= a.accepted %></span></td>
+                  <td>
+                    <div class="score-bar-container">
+                      <span class="score-value"><%= rate %>%</span>
+                      <div class="score-bar">
+                        <div class="score-bar-fill" style="width:<%= rate %>%;"></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style="color:var(--text-secondary);font-size:0.8rem;"><%= new Date(a.updatedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) %></td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>

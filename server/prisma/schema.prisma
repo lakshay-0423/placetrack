@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("PG_URI")
+}
+
+model PlacementReport {
+  id               Int      @id @default(autoincrement())
+  companyName      String   @map("company_name") @db.VarChar(255)
+  companyMongoId   String?  @map("company_mongo_id") @db.VarChar(50)
+  hiringYear       Int      @map("hiring_year")
+  jobsOffered      Int      @default(0) @map("jobs_offered")
+  studentsSelected Int      @default(0) @map("students_selected")
+  averagePackage   Decimal  @default(0) @map("average_package") @db.Decimal(10, 2)
+  highestPackage   Decimal  @default(0) @map("highest_package") @db.Decimal(10, 2)
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@unique([companyMongoId, hiringYear], name: "placement_reports_uq")
+  @@map("placement_reports")
+}
+
+model CompanyAnalytics {
+  id              Int      @id @default(autoincrement())
+  companyName     String   @map("company_name") @db.VarChar(255)
+  companyMongoId  String?  @map("company_mongo_id") @db.VarChar(50)
+  totalApplicants Int      @default(0) @map("total_applicants")
+  shortlisted     Int      @default(0)
+  accepted        Int      @default(0)
+  hiringYear      Int      @map("hiring_year")
+  updatedAt       DateTime @default(now()) @map("updated_at")
+
+  @@unique([companyMongoId, hiringYear], name: "company_analytics_uq")
+  @@map("company_analytics")
+}

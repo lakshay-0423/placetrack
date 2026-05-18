@@ -1,0 +1,171 @@
+<%- include('partials/header') %>
+
+  <div class="container">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.5rem;">
+      <div>
+        <h1 class="page-title animate-in">📊 Analytics Dashboard</h1>
+        <p class="page-subtitle animate-in animate-in-delay-1">Aggregate placement metrics synced from MongoDB</p>
+      </div>
+      <button class="btn-sync animate-in animate-in-delay-2" id="syncBtn" onclick="syncData()">
+        🔄 Sync Data
+      </button>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="stats-grid">
+      <div class="glass-card stat-card animate-in animate-in-delay-1">
+        <div class="stat-icon" style="background: rgba(99, 102, 241, 0.15);">🎓</div>
+        <div class="stat-value" style="color: #a5b4fc;"><%= totalPlacements %></div>
+        <div class="stat-label">Total Placements</div>
+      </div>
+      <div class="glass-card stat-card animate-in animate-in-delay-2">
+        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.15);">💰</div>
+        <div class="stat-value" style="color: #6ee7b7;">₹<%= avgPackage %></div>
+        <div class="stat-label">Avg Package (LPA)</div>
+      </div>
+      <div class="glass-card stat-card animate-in animate-in-delay-3">
+        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.15);">🏆</div>
+        <div class="stat-value" style="color: #fcd34d;">₹<%= highestPackage %></div>
+        <div class="stat-label">Highest Package (LPA)</div>
+      </div>
+      <div class="glass-card stat-card animate-in animate-in-delay-4">
+        <div class="stat-icon" style="background: rgba(59, 130, 246, 0.15);">📈</div>
+        <div class="stat-value" style="color: #93c5fd;"><%= placementRate %>%</div>
+        <div class="stat-label">Placement Rate</div>
+      </div>
+      <div class="glass-card stat-card animate-in animate-in-delay-5">
+        <div class="stat-icon" style="background: rgba(236, 72, 153, 0.15);">🏢</div>
+        <div class="stat-value" style="color: #f9a8d4;"><%= totalRecruiters %></div>
+        <div class="stat-label">Total Recruiters</div>
+      </div>
+      <div class="glass-card stat-card animate-in animate-in-delay-5">
+        <div class="stat-icon" style="background: rgba(139, 92, 246, 0.15);">💼</div>
+        <div class="stat-value" style="color: #c4b5fd;"><%= totalJobs %></div>
+        <div class="stat-label">Jobs Offered</div>
+      </div>
+    </div>
+
+    <!-- Reports Table -->
+    <div class="glass-card animate-in animate-in-delay-3">
+      <h2 style="margin-bottom: 1.25rem; font-size: 1.15rem; font-weight: 600;">Placement Reports by Company</h2>
+      <% if (reports.length === 0) { %>
+        <div class="empty-state">
+          <div class="icon">📭</div>
+          <p>No placement reports yet. Click <strong>Sync Data</strong> to populate from MongoDB.</p>
+        </div>
+      <% } else { %>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Company</th>
+                <th>Year</th>
+                <th>Jobs</th>
+                <th>Selected</th>
+                <th>Avg Pkg</th>
+                <th>Highest Pkg</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% reports.forEach(function(r) { %>
+                <tr>
+                  <td style="font-weight: 500;"><%= r.companyName %></td>
+                  <td><span class="badge badge-info"><%= r.hiringYear %></span></td>
+                  <td><%= r.jobsOffered %></td>
+                  <td><span class="badge badge-success"><%= r.studentsSelected %></span></td>
+                  <td>₹<%= parseFloat(r.averagePackage).toFixed(2) %></td>
+                  <td style="color: #fcd34d; font-weight: 600;">₹<%= parseFloat(r.highestPackage).toFixed(2) %></td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Sync Result Modal -->
+  <div id="syncModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); z-index:999; align-items:center; justify-content:center;">
+    <div style="background:var(--bg-card); border:1px solid var(--glass-border); border-radius:20px; padding:2.5rem; max-width:420px; width:90%; box-shadow:0 24px 80px rgba(0,0,0,0.6); animation:fadeInUp 0.4s ease;">
+      <div id="modalIcon" style="text-align:center; font-size:3rem; margin-bottom:1rem;"></div>
+      <h2 id="modalTitle" style="text-align:center; font-size:1.3rem; margin-bottom:1.5rem;"></h2>
+      <div id="modalStats" style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1.5rem;"></div>
+      <div id="modalError" style="display:none; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); border-radius:10px; padding:1rem; margin-bottom:1.5rem; color:#fca5a5; font-size:0.88rem; text-align:center;"></div>
+      <button onclick="closeModal()" style="width:100%; padding:0.75rem; border:none; border-radius:10px; background:linear-gradient(135deg,var(--primary),#8b5cf6); color:#fff; font-weight:600; font-size:0.9rem; cursor:pointer; transition:all 0.3s ease; box-shadow:0 4px 15px var(--primary-glow);">
+        Got it
+      </button>
+    </div>
+  </div>
+
+  <script>
+    function showModal(type, data) {
+      const modal = document.getElementById('syncModal');
+      const icon = document.getElementById('modalIcon');
+      const title = document.getElementById('modalTitle');
+      const stats = document.getElementById('modalStats');
+      const error = document.getElementById('modalError');
+
+      stats.innerHTML = '';
+      error.style.display = 'none';
+
+      if (type === 'success') {
+        icon.textContent = '✅';
+        title.textContent = 'Sync Complete!';
+        title.style.color = '#6ee7b7';
+
+        const cards = [
+          { label: 'Reports Synced', value: data.reportsSynced, color: '#a5b4fc', bg: 'rgba(99,102,241,0.12)' },
+          { label: 'Analytics Synced', value: data.analyticsSynced, color: '#6ee7b7', bg: 'rgba(16,185,129,0.12)' }
+        ];
+        cards.forEach(c => {
+          stats.innerHTML += `
+            <div style="background:${c.bg}; border-radius:12px; padding:1rem; text-align:center;">
+              <div style="font-size:1.8rem; font-weight:700; color:${c.color}; letter-spacing:-1px;">${c.value}</div>
+              <div style="font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px; margin-top:0.3rem;">${c.label}</div>
+            </div>`;
+        });
+      } else {
+        icon.textContent = '❌';
+        title.textContent = 'Sync Failed';
+        title.style.color = '#fca5a5';
+        stats.style.display = 'none';
+        error.style.display = 'block';
+        error.textContent = data.message || 'An unexpected error occurred.';
+      }
+
+      modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('syncModal').style.display = 'none';
+      document.getElementById('modalStats').style.display = 'grid';
+      location.reload();
+    }
+
+    async function syncData() {
+      const btn = document.getElementById('syncBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Syncing…';
+      try {
+        const res = await fetch('/admin/reports/sync', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showModal('success', data);
+        } else {
+          showModal('error', data);
+        }
+      } catch (e) {
+        showModal('error', { message: 'Network error: ' + e.message });
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🔄 Sync Data';
+      }
+    }
+  </script>
+</body>
+</html>
+

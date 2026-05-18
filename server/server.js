@@ -40,7 +40,11 @@ io.on("connection", (socket) => {
 });
 
 app.use(cors({
-  origin: process.env.CLIENT_URL || "http://localhost:5173",
+  origin: [
+    process.env.CLIENT_URL,
+    "http://localhost:5173",
+    "https://intelligent-campus-placement-system-1.onrender.com"
+  ],
   credentials: true
 }));
 

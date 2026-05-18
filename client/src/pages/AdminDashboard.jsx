@@ -154,7 +154,7 @@ const AdminDashboard = () => {
                   ].map(link => (
                     <a
                       key={link.path}
-                      href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${link.path}`}
+                      href={`${import.meta.env.PROD ? '' : 'http://localhost:5000'}${link.path}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn btn-secondary"
